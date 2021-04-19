@@ -5,11 +5,31 @@ clear_cmd = None
 #-_-_-_-_-_-Global Variables-_-_-_-_-_-#
 
 
-middleware_template = '''
-const middleware = require(process.cwd() + "/skyend/middleware");
+middleware_template = '''const express = require("express");
+
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+/**
+ * 
+ * @param {number} level 
+ * @param {string} name 
+ * @returns { {level: number, name: string, func: *, app: express.Application} }
+ */
+function Middleware(level, name) 
+{
+    return {
+        level   : level,
+        name    : name,
+        func    : null,
+        app     : null
+    };
+}
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
 
 //Create the middleware object.
-const middle = middleware(%order%, "%name%");
+const middle = Middleware(%order%, "%name%");
+
+
+
 
 /**
  * 
@@ -19,6 +39,7 @@ const middle = middleware(%order%, "%name%");
  */
 const %name% = (req, res, next)=>
 {
+    //Thi is where your code goes!!!!
     res.send("%name% Works!!!");
     console.log("%name% Works!!!");
 };
@@ -28,8 +49,47 @@ const %name% = (req, res, next)=>
 
 //DO NOT MESH WITH THIS CODE.
 middle.func     = %name%;
-module.exports  = middle;
-'''
+module.exports  = middle;'''
+
+
+
+
+router_template = '''const express   = require("express");
+
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+/**
+ * 
+ * @param {string} name 
+ * @returns { {name: string, router: express.Router, app: express.Application} }
+ */
+function Router(name) 
+{
+    return {
+        name  : name,
+        router: express.Router(),
+        app   : null
+    };
+}
+
+//Use router.router to access the express router.
+const router = Router("%name%");
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+
+
+
+//---------------------This is where your code goes---------------------//
+
+router.router.get("/%name%", (req, res)=>
+{
+    res.send("GET /%name% is working!");
+});
+
+//---------------------This is where your code goes---------------------//
+
+
+
+//DO NOT MESH WITH THIS CODE.
+module.exports  = router;'''
 
 
 
@@ -44,7 +104,7 @@ def main():
         #Print the menu.
         print("==========Skyend (Main Menu)==========")
         print("1) New Middleware")
-        print("2) New Route")
+        print("2) New Router")
         print("3) Quit")
         print("==========Skyend (Main Menu)==========")
 
@@ -55,9 +115,9 @@ def main():
         if choice == "1":
             createMiddleware()
         
-        #Create new Route.
+        #Create new Router.
         elif choice == "2":
-            continue
+            createRouter()
         
         #Exit the program.
         elif choice == "3" or choice == "quit" or choice == "exit":
@@ -137,6 +197,76 @@ def createMiddleware():
         print("Stack     :", traceback.format_exc())
         input("Press ENTER to continue...")
 #========================Create Middleware========================#
+
+
+
+
+
+#==========================Create Router==========================#
+def createRouter():
+
+    #Clear the screen.
+    os.system(clear_cmd)
+
+    #Get the name/path relative to the src/routes directory.
+    path  = input("Router name: ")
+
+    #Split the filename and the extension.
+    filename, file_extension = os.path.splitext(path)
+
+    #Make sure the file_extension is .js
+    file_extension = ".js"
+    
+    #Get the basename of the path witout the extension.
+    basename = os.path.basename(filename)
+
+    #Keep only the first string if there are dots in the name.
+    basename = basename.split(".")[0]
+
+    #Change the path to contain the filename + .middleware.
+    path = filename + ".router"
+
+    #Append the .js extention.
+    path = path + file_extension
+
+    #Create the actual path.
+    actual_path = os.path.join("src", os.path.join("routers", path))
+
+    #Create the script file.
+    try:
+
+        #Create the directories first.
+        os.makedirs(os.path.dirname(actual_path), exist_ok=True)
+
+        with open(actual_path, "w") as file:
+            file.write(router_template.replace("%name%", basename))
+        
+        print("\nRouter:", actual_path, ", was created!!!")
+        input("Press ENTER to continue...")
+
+
+    #Permission Error.
+    except PermissionError:
+        print("Router:'", actual_path, "' creation failed.")
+        print("Reason    : Permission Denied.")
+        print("Tip       : Make sure Skyend project has the appropriate file permissions.\n")
+        input("Press ENTER to continue...")
+
+    #File Not Found Error.
+    except FileNotFoundError:
+        print("Router:'", actual_path, "' creation failed.")
+        print("Reason    : Invalid name.")
+        print("Tip       : Make sure the name is an appropriate file path.\n")
+        input("Press ENTER to continue...")
+
+    #Uknown Error.
+    except Exception:
+        print("Router:'", actual_path, "' creation failed.")
+        print("Reason    : Uknown.")
+        print("Tip       : Report this as a bug.\n")
+        print("Stack     :", traceback.format_exc())
+        input("Press ENTER to continue...")
+#==========================Create Router==========================#
 
 
 

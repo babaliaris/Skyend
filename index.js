@@ -12,7 +12,7 @@ const app = express();
 dotenv.config();
 
 //-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
-const MIDDLEWARE = [];
+let MIDDLEWARE = [];
 //-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
 
 
@@ -55,22 +55,28 @@ MIDDLEWARE.forEach((middle)=>
     app.use(middle.func);
 });
 
+//We don't need this array anymore...
+MIDDLEWARE = null;
+
 //===================Load All The Middleware Scripts===================//
 
 
 
 
 //=====================Load All The Route Scripts=====================//
-walkdir.sync("./src/routes", (path, stat)=>
+walkdir.sync("./src/routers", (path, stat)=>
 {
     //If the path is a javascript file.
     if (stat.isFile() && path.includes(".js"))
     {
         //Require the Route script.
-        const route = require(path);
+        const router = require(path);
+
+        //Set the app object.
+        router.app = app;
         
-        //Usese it in the app.
-        app.use(route);
+        //Use it in the app.
+        app.use(router.router);
     }
 });
 //=====================Load All The Route Scripts=====================//
