@@ -23,7 +23,9 @@
   },
   "homepage": "https://github.com/babaliaris/Skyend#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
     "mocha": "^8.3.2"
   }
 }
