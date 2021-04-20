@@ -46,6 +46,22 @@ app.use((req, res, next)=>
 
 
 
+//Require all the startup Scripts.
+walkdir.sync("./src/startup", (path, stat)=>
+{
+    //If the path is a javascript file.
+    if (stat.isFile() && path.includes(".js"))
+    {
+        //Require the startup script.
+        const start_up_script = require(path);
+
+        //Run the startup script.
+        start_up_script(app);
+    }
+});
+
+
+
 
 //===================Load All The Middleware Scripts===================//
 
