@@ -17,7 +17,7 @@ class Logger
         this.logger = winston.createLogger(
         {
             level           : 'info',
-            format          : winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.json()),
+            format          : winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.json(), winston.format.prettyPrint()),
             defaultMeta     : { service: 'user-service' },
             transports      : [
                 new WinstonRotatingFile({

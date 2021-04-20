@@ -3,13 +3,11 @@ const { WinstonRotatingFile }   = require("winston-rotating-file");
 const winston                   = require('winston');
 
 
-
-
 //Create the winston logger object.
 const logger = winston.createLogger(
 {
     level           : 'info',
-    format          : winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.json()),
+    format          : winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.json(), winston.format.prettyPrint()),
     defaultMeta     : { service: 'user-service' },
     transports      : [
         new WinstonRotatingFile({
@@ -54,7 +52,14 @@ class Database
             //Log the error.
             if (err)
             {
+                //Log the error.
                 logger.error({message: err.message, stack: err.stack});
+                
+                //If dev mode, print it to the console.
+                if (process.env.NODE_ENV !== "production")
+                    console.log(err.stack);
+
+                //Set the conn member to null.
                 this.conn = null;
             }
 
@@ -73,8 +78,16 @@ class Database
         {
             //Log the error.
             if (err)
+            {
+                //Log the error.
                 logger.error({message: err.message, stack: err.stack});
+                
+                //If dev mode, print it to the console.
+                if (process.env.NODE_ENV !== "production")
+                    console.log(err.stack);
+            }
 
+            //Set the conn member to null.
             this.conn = null;
         });
     }
