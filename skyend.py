@@ -93,6 +93,25 @@ module.exports  = router;'''
 
 
 
+startup_template = '''//Import express.js
+const express = require("express");
+
+/**
+ * 
+ * @param {express.Application} app 
+ * @return {void}
+ */
+const %name% = (app)=>
+{
+    console.log("%name% script works!!!");
+};
+
+
+//Export the function.
+module.exports = %name%;'''
+
+
+
 #============================Main Menu============================#
 def main():
     
@@ -105,7 +124,8 @@ def main():
         print("==========Skyend (Main Menu)==========")
         print("1) New Middleware")
         print("2) New Router")
-        print("3) Quit")
+        print("3) New StartUp")
+        print("4) Quit")
         print("==========Skyend (Main Menu)==========")
 
         #Get user input.
@@ -118,9 +138,13 @@ def main():
         #Create new Router.
         elif choice == "2":
             createRouter()
+
+        #Create new StartUp.
+        elif choice == "3":
+            createStartup()
         
         #Exit the program.
-        elif choice == "3" or choice == "quit" or choice == "exit":
+        elif choice == "4" or choice == "quit" or choice == "exit":
             return
         
         #Uknown input, continue.
@@ -288,6 +312,84 @@ def createRouter():
         input("Press ENTER to continue...")
 #==========================Create Router==========================#
 
+
+
+
+#==========================Create StartUp=========================#
+def createStartup():
+
+    #Clear the screen.
+    os.system(clear_cmd)
+
+    #Get the name/path relative to the src/startup directory.
+    path  = input("StartUp name: ")
+
+    #Split the filename and the extension.
+    filename, file_extension = os.path.splitext(path)
+    
+    #Get the basename of the path witout the extension.
+    basename = os.path.basename(filename)
+
+    #Keep only the first string if there are dots in the name.
+    basename = basename.split(".")[0]
+
+    #Change the path to contain the filename + .startup.
+    path = filename + file_extension + ".startup.js"
+
+    #Create the actual path.
+    actual_path = os.path.join("src", os.path.join("startup", path))
+
+    #Create the script file.
+    try:
+
+        #Create the directories first.
+        os.makedirs(os.path.dirname(actual_path), exist_ok=True)
+
+        #Ask to ovveride a file.
+        if os.path.exists(actual_path):
+
+            #Ask the user what to do.
+            choice = input("The StartUp: '"+actual_path+"' already exists. Do you want to ovewrite it? (yes, no): ")
+
+            #Ovveride the file.
+            if choice == "yes" or choice == "y": 
+                pass
+
+            #Abord.
+            else: 
+                return
+
+        #Create and write the file.
+        with open(actual_path, "w") as file:
+            file.write(startup_template.replace("%name%", basename))
+        
+        #Print success message.
+        print("\nStartUp:", actual_path, ", was created!!!")
+        input("Press ENTER to continue...")
+
+
+    #Permission Error.
+    except PermissionError:
+        print("StartUp:'", actual_path, "' creation failed.")
+        print("Reason    : Permission Denied.")
+        print("Tip       : Make sure Skyend project has the appropriate file permissions.\n")
+        input("Press ENTER to continue...")
+
+    #File Not Found Error.
+    except FileNotFoundError:
+        print("StartUp:'", actual_path, "' creation failed.")
+        print("Reason    : Invalid name.")
+        print("Tip       : Make sure the name is an appropriate file path.\n")
+        input("Press ENTER to continue...")
+
+    #Uknown Error.
+    except Exception:
+        print("StartUp:'", actual_path, "' creation failed.")
+        print("Reason    : Uknown.")
+        print("Tip       : Report this as a bug.\n")
+        print("Stack     :", traceback.format_exc())
+        input("Press ENTER to continue...")
+#==========================Create StartUp=========================#
 
 
 
