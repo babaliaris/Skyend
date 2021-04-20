@@ -42,12 +42,6 @@ app.use((req, res, next)=>
     next();
 });
 
-//Public Folder Configuration.
-app.use(express.static("./public"));
-
-//JSON converter middleware.
-app.use(express.json());
-
 //----------------Basic MUST HAVE middlewares----------------//
 
 

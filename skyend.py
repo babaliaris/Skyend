@@ -143,9 +143,6 @@ def createMiddleware():
 
     #Split the filename and the extension.
     filename, file_extension = os.path.splitext(path)
-
-    #Make sure the file_extension is .js
-    file_extension = ".js"
     
     #Get the basename of the path witout the extension.
     basename = os.path.basename(filename)
@@ -154,10 +151,7 @@ def createMiddleware():
     basename = basename.split(".")[0]
 
     #Change the path to contain the filename + .middleware.
-    path = filename + ".middleware"
-
-    #Append the .js extention.
-    path = path + file_extension
+    path = filename + file_extension + ".middleware.js"
 
     #Create the actual path.
     actual_path = os.path.join("src", os.path.join("middleware", path))
@@ -229,9 +223,6 @@ def createRouter():
 
     #Split the filename and the extension.
     filename, file_extension = os.path.splitext(path)
-
-    #Make sure the file_extension is .js
-    file_extension = ".js"
     
     #Get the basename of the path witout the extension.
     basename = os.path.basename(filename)
@@ -239,11 +230,8 @@ def createRouter():
     #Keep only the first string if there are dots in the name.
     basename = basename.split(".")[0]
 
-    #Change the path to contain the filename + .middleware.
-    path = filename + ".router"
-
-    #Append the .js extention.
-    path = path + file_extension
+    #Change the path to contain the filename + .router.
+    path = filename + file_extension + ".router.js"
 
     #Create the actual path.
     actual_path = os.path.join("src", os.path.join("routers", path))
