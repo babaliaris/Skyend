@@ -16,7 +16,6 @@ let LAST_REQUEST_PATH = "";
 process.on("uncaughtException", (err)=>
 {
     logger.error(err, LAST_REQUEST_PATH);
-    LAST_REQUEST_PATH = ""; //Reset the LAST_REQUEST_PATH.
 });
 
 
@@ -24,7 +23,6 @@ process.on("uncaughtException", (err)=>
 process.on("unhandledRejection", (err)=>
 {
     logger.error(err, LAST_REQUEST_PATH);
-    LAST_REQUEST_PATH = ""; //Reset the LAST_REQUEST_PATH.
 });
 
 
