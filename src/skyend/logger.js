@@ -1,5 +1,8 @@
-const { WinstonRotatingFile } = require("winston-rotating-file");
-const winston = require('winston');
+const { WinstonRotatingFile }   = require("winston-rotating-file");
+const winston                   = require('winston');
+const util                      = require("util");
+const dayjs                     = require("dayjs");
+const Database                  = require("./database");
 
 
 class Logger
@@ -34,39 +37,32 @@ class Logger
 
 
     /**
+     * @description Logs an Error object to the logger.log file and to the t_skyend_logger table.
      * 
-     * @param {*} err The error object.
+     * @param {Error} err The error object.
+     * @returns {void}
      */
     error = (err)=>
     {
-        //Get the stack.
-        const stack = err.stack;
+        //If err has stack and message properties.
+        if (err.stack && err.message);
 
-        //If there was ineed a stack property.
-        if (stack)
-        {
-            this.logger.error({message: err.message, stack: stack});
-        }
-
-        //Stack property is not defined.
+        //Do not accept a non Error object.
         else
         {
-            this.logger.error({message: err.toString(), stack: ""});
+            //Represent the object structure as a string.
+            const err_string = util.inspect(err, false, null, true);
+
+            //Create a fake error.
+            err = new Error("Not an Error Object ===> "+err_string);
         }
 
+        //Log the error.
+        this.logger.error({message: err.message, stack: err.stack});
 
         //If we are in Dev Mode.
         if (process.env.NODE_ENV !== "production")
-        {
-
-            //If there was a stack string, print it.
-            if (stack)
-                console.log(stack);
-            
-            //Else print the err object as a string.
-            else
-                console.log(err.toString());
-        }
+            console.log(err.stack);
     }
 };
 
