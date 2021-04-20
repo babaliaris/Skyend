@@ -43,7 +43,7 @@ class Logger
      * @param {string} path The request path if the error comes from a request.
      * @returns {void}
      */
-    error = (err, path="")=>
+    error = (err, path)=>
     {
         //If err has stack and message properties.
         if (err.stack && err.message);
