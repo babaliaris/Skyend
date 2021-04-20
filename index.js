@@ -30,7 +30,12 @@ process.on("unhandledRejection", (err)=>
 const app = express();
 
 //Load the environment variables.
-dotenv.config();
+const dote_env_results = dotenv.config();
+
+//If .env was not found or not loaded for any reason
+//then throw an error and stop the application.
+if (dote_env_results.error)
+    throw dote_env_results.error;
 
 //----------------Basic MUST HAVE middlewares----------------//
 
