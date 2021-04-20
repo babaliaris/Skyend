@@ -11,6 +11,9 @@ const app = express();
 //Load the environment variables.
 dotenv.config();
 
+//Public Folder Configuration.
+app.use(express.static("./public"));
+
 //-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
 let MIDDLEWARE = [];
 //-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
