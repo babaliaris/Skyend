@@ -38,7 +38,7 @@ class Database
      */
     connect = ()=>
     {
-        return new Promise((resolve)=>
+        return new Promise((resolve, reject)=>
         {
             //Create the connection object.
             this.conn = mysql.createConnection({
@@ -71,7 +71,7 @@ class Database
                 //Resolve this promise.
                 else
                 {
-                    resolve();
+                    resolve(this.conn);
                 }
             });
         });
