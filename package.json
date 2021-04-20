@@ -26,6 +26,7 @@
     "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-openapi-validator": "^4.12.8",
     "mysql": "^2.18.1",
     "walkdir": "^0.4.1",
     "winston": "^3.3.3",
