@@ -34,35 +34,42 @@ class Database
     
     /**
      * @description Connect to the database using the environment variables.
-     * @returns {void}
+     * @returns {Promise}
      */
     connect = ()=>
     {
-        //Create the connection object.
-        this.conn = mysql.createConnection({
-            database: process.env.DB_NAME,
-            user    : process.env.DB_USER,
-            password: process.env.DB_PASS,
-            host    : process.env.DB_HOST
-        });
 
-        //Try to connect to the database.
-        this.conn.connect((err)=>
-        {   
-            //Log the error.
-            if (err)
-            {
+        //NEVER reject this promise, INSTEAD handle the error here!!!
+        return new Promise((resolve)=>
+        {
+            //Create the connection object.
+            this.conn = mysql.createConnection({
+                database: process.env.DB_NAME,
+                user    : process.env.DB_USER,
+                password: process.env.DB_PASS,
+                host    : process.env.DB_HOST
+            });
+
+            //Try to connect to the database.
+            this.conn.connect((err)=>
+            {   
                 //Log the error.
-                logger.error({message: err.message, stack: err.stack});
-                
-                //If dev mode, print it to the console.
-                if (process.env.NODE_ENV !== "production")
-                    console.log(err.stack);
+                if (err)
+                {
+                    //Log the error.
+                    logger.error({message: err.message, stack: err.stack});
+                    
+                    //If dev mode, print it to the console.
+                    if (process.env.NODE_ENV !== "production")
+                        console.log(err.stack);
 
-                //Set the conn member to null.
-                this.conn = null;
-            }
+                    //Set the conn member to null.
+                    this.conn = null;
+                }
 
+                //Resolve this promise.
+                resolve();
+            });
         });
     }
 
@@ -74,22 +81,26 @@ class Database
      */
     disconnect = ()=>
     {
-        this.conn.end((err)=>
+        //if this.conn is defined and not null.
+        if (this.conn)
         {
-            //Log the error.
-            if (err)
+            this.conn.end((err)=>
             {
                 //Log the error.
-                logger.error({message: err.message, stack: err.stack});
-                
-                //If dev mode, print it to the console.
-                if (process.env.NODE_ENV !== "production")
-                    console.log(err.stack);
-            }
+                if (err)
+                {
+                    //Log the error.
+                    logger.error({message: err.message, stack: err.stack});
+                    
+                    //If dev mode, print it to the console.
+                    if (process.env.NODE_ENV !== "production")
+                        console.log(err.stack);
+                }
 
-            //Set the conn member to null.
-            this.conn = null;
-        });
+                //Set the conn member to null.
+                this.conn = null;
+            });
+        }
     }
 
 
@@ -127,80 +138,28 @@ class Database
             const query = `INSERT INTO ${table} (${columns}) VALUES (${markers});`;
             
             //Connect.
-            this.connect();
-
-            //EXECUTE THE QUERY.
-            this.conn.query(query, values, (err, results)=>
-            {   
-                //An error has occured.
-                if (err)
-                    reject(err);
-
-                //Query succeeded.
-                else
-                    resolve(results);
-                
-                //Disconnect.
-                this.disconnect();
-            });
-        });
-
-    };
-
-
-
-    /**
-     * @description Insert one row to a table. This method connects and disconnects automatically.
-     * 
-     * @param {string} table The name of the table.
-     * @param {object} data  The data object. The properties of this obj must have THE SAME NAME as the columns in the table.
-     * @returns {Promise}
-     */
-    post = (table, data)=>
-    {
-        return new Promise((resolve, reject)=>
-        {
-            //Some Variables//
-            let columns = "";
-            let markers = "";
-            let values  = [];
-            //Some Variables//
-
-            //Create the column, markers and values.
-            for (let key in data)
+            this.connect().then(()=>
             {
-                columns += key + ",";
-                markers += "?" + ",";
-                values.push(data[key]);
-            }
+                //EXECUTE THE QUERY.
+                this.conn.query(query, values, (err, results)=>
+                {   
+                    //An error has occured.
+                    if (err)
+                        reject(err);
 
-            //Remove the last comma (,) from the columns and markers strings.
-            columns = columns.slice(0, columns.lastIndexOf(","));
-            markers = markers.slice(0, markers.lastIndexOf(","));
-
-            //Create the query string.
-            const query = `INSERT INTO ${table} (${columns}) VALUES (${markers});`;
-            
-            //Connect.
-            this.connect();
-
-            //EXECUTE THE QUERY.
-            this.conn.query(query, values, (err, results)=>
-            {   
-                //An error has occured.
-                if (err)
-                    reject(err);
-
-                //Query succeeded.
-                else
-                    resolve(results);
-                
-                //Disconnect.
-                this.disconnect();
+                    //Query succeeded.
+                    else
+                        resolve(results);
+                    
+                    //Disconnect.
+                    this.disconnect();
+                });
             });
+
         });
 
     };
+
 
 
 
@@ -253,21 +212,22 @@ class Database
             const query = `UPDATE ${table} SET ${columns} WHERE ${where_cond};`;
             
             //Connect.
-            this.connect();
+            this.connect().then(()=>
+            {
+                //EXECUTE THE QUERY.
+                this.conn.query(query, values, (err, results)=>
+                {   
+                    //An error has occured.
+                    if (err)
+                        reject(err);
 
-            //EXECUTE THE QUERY.
-            this.conn.query(query, values, (err, results)=>
-            {   
-                //An error has occured.
-                if (err)
-                    reject(err);
-
-                //Query succeeded.
-                else
-                    resolve(results);
-                
-                //Disconnect.
-                this.disconnect();
+                    //Query succeeded.
+                    else
+                        resolve(results);
+                    
+                    //Disconnect.
+                    this.disconnect();
+                });
             });
             
         });
@@ -314,21 +274,22 @@ class Database
             const query = `DELETE FROM ${table} WHERE ${where_cond};`;
             
             //Connect.
-            this.connect();
+            this.connect().then(()=>
+            {
+                //EXECUTE THE QUERY.
+                this.conn.query(query, values, (err, results)=>
+                {   
+                    //An error has occured.
+                    if (err)
+                        reject(err);
 
-            //EXECUTE THE QUERY.
-            this.conn.query(query, values, (err, results)=>
-            {   
-                //An error has occured.
-                if (err)
-                    reject(err);
-
-                //Query succeeded.
-                else
-                    resolve(results);
-                
-                //Disconnect.
-                this.disconnect();
+                    //Query succeeded.
+                    else
+                        resolve(results);
+                    
+                    //Disconnect.
+                    this.disconnect();
+                });
             });
             
         });
@@ -375,21 +336,22 @@ class Database
             const query = `SELECT * FROM ${table} WHERE ${where_cond};`;
             
             //Connect.
-            this.connect();
+            this.connect().then(()=>
+            {
+                //EXECUTE THE QUERY.
+                this.conn.query(query, values, (err, results)=>
+                {   
+                    //An error has occured.
+                    if (err)
+                        reject(err);
 
-            //EXECUTE THE QUERY.
-            this.conn.query(query, values, (err, results)=>
-            {   
-                //An error has occured.
-                if (err)
-                    reject(err);
-
-                //Query succeeded.
-                else
-                    resolve(results);
-                
-                //Disconnect.
-                this.disconnect();
+                    //Query succeeded.
+                    else
+                        resolve(results);
+                    
+                    //Disconnect.
+                    this.disconnect();
+                });
             });
             
         });
@@ -426,21 +388,22 @@ class Database
             const query = `CALL ${procedure}(${markers});`;
             
             //Connect.
-            this.connect();
+            this.connect().then(()=>
+            {
+                //EXECUTE THE QUERY.
+                this.conn.query(query, values, (err, results)=>
+                {   
+                    //An error has occured.
+                    if (err)
+                        reject(err);
 
-            //EXECUTE THE QUERY.
-            this.conn.query(query, args, (err, results)=>
-            {   
-                //An error has occured.
-                if (err)
-                    reject(err);
-
-                //Query succeeded.
-                else
-                    resolve(results);
-                
-                //Disconnect.
-                this.disconnect();
+                    //Query succeeded.
+                    else
+                        resolve(results);
+                    
+                    //Disconnect.
+                    this.disconnect();
+                });
             });
             
         });
