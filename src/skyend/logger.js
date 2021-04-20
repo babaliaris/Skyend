@@ -63,6 +63,31 @@ class Logger
         //If we are in Dev Mode.
         if (process.env.NODE_ENV !== "production")
             console.log(err.stack);
+        
+        //Create the database object.
+        const db = new Database();
+
+        //Create the log data.
+        const log_data = {
+            m_source    : "Skyend",
+            m_level     : "error",
+            m_message   : err.message,
+            m_stack     : err.stack,
+            m_timestamp : dayjs(Date.now()).format("YYYY-MM-DD hh:mm:ss")
+        };
+
+        //Insert the log into the t_skyend_logger table.
+        db.post("t_skyend_logger", log_data).then((results)=>
+        {
+        }).catch((err)=>
+        {
+            //Log the error.
+            this.logger.error({message: err.message, stack: err.stack});
+
+            //If we are in Dev Mode.
+            if (process.env.NODE_ENV !== "production")
+                console.log(err.stack);
+        });
     }
 };
 

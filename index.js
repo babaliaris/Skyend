@@ -13,6 +13,13 @@ process.on("uncaughtException", (err)=>
 });
 
 
+//Unhandled Promise Rejections.
+process.on("unhandledRejection", (err)=>
+{
+    logger.error(err);
+});
+
+
 //Create the Express App.
 const app = express();
 
