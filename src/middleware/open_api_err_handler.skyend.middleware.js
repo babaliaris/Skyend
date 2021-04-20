@@ -31,10 +31,7 @@ const middle = Middleware(3, "open_api_err_handler");
  */
 const open_api_err_handler = (err, req, res, next)=>
 {
-    res.status(err.status || 500).json({
-        message     : err.message,
-        specifics   : err.errors
-    });
+    res.status(err.status || 500).json(err.errors);
 };
 
 
