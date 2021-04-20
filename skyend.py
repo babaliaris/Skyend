@@ -168,9 +168,25 @@ def createMiddleware():
         #Create the directories first.
         os.makedirs(os.path.dirname(actual_path), exist_ok=True)
 
+        #Ask to ovveride a file.
+        if os.path.exists(actual_path):
+
+            #Ask the user what to do.
+            choice = input("The middleware: '"+actual_path+"' already exists. Do you want to ovewrite it? (yes, no): ")
+
+            #Ovveride the file.
+            if choice == "yes" or choice == "y": 
+                pass
+
+            #Abord.
+            else: 
+                return
+
+        #Create and write the file.
         with open(actual_path, "w") as file:
             file.write(middleware_template.replace("%name%", basename).replace("%order%", order))
         
+        #Print a success message.
         print("\nMiddleware:", actual_path, ", was created!!!")
         input("Press ENTER to continue...")
 
@@ -238,9 +254,25 @@ def createRouter():
         #Create the directories first.
         os.makedirs(os.path.dirname(actual_path), exist_ok=True)
 
+        #Ask to ovveride a file.
+        if os.path.exists(actual_path):
+
+            #Ask the user what to do.
+            choice = input("The router: '"+actual_path+"' already exists. Do you want to ovewrite it? (yes, no): ")
+
+            #Ovveride the file.
+            if choice == "yes" or choice == "y": 
+                pass
+
+            #Abord.
+            else: 
+                return
+
+        #Create and write the file.
         with open(actual_path, "w") as file:
             file.write(router_template.replace("%name%", basename))
         
+        #Print success message.
         print("\nRouter:", actual_path, ", was created!!!")
         input("Press ENTER to continue...")
 
