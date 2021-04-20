@@ -55,7 +55,8 @@ class Logger
             const err_string = util.inspect(err, false, null, true);
 
             //Create a fake error.
-            err = new Error("Not an Error Object ===> "+err_string);
+            err = new Error("Uknown Error ===> "+err_string);
+            err.stack = ""; //Remove the stack.
         }
 
         //Log the error.
