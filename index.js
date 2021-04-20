@@ -6,17 +6,25 @@ const logger    = require("./src/skyend/logger");
 //################### Require ###################//
 
 
+//-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
+let MIDDLEWARE        = [];
+let LAST_REQUEST_PATH = "";
+//-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
+
+
 //Uncaught Errors Handler.
 process.on("uncaughtException", (err)=>
 {
-    logger.error(err);
+    logger.error(err, LAST_REQUEST_PATH);
+    LAST_REQUEST_PATH = ""; //Reset the LAST_REQUEST_PATH.
 });
 
 
 //Unhandled Promise Rejections.
 process.on("unhandledRejection", (err)=>
 {
-    logger.error(err);
+    logger.error(err, LAST_REQUEST_PATH);
+    LAST_REQUEST_PATH = ""; //Reset the LAST_REQUEST_PATH.
 });
 
 
@@ -27,13 +35,23 @@ const app = express();
 dotenv.config();
 
 //----------------Basic MUST HAVE middlewares----------------//
-app.use(express.static("./public")); //Public Folder Configuration.
-app.use(express.json()); //JSON converter middleware.
+
+//Set the LAST_REQUEST_PATH.
+app.use((req, res, next)=>
+{
+    LAST_REQUEST_PATH = req.path;
+    next();
+});
+
+//Public Folder Configuration.
+app.use(express.static("./public"));
+
+//JSON converter middleware.
+app.use(express.json());
+
 //----------------Basic MUST HAVE middlewares----------------//
 
-//-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
-let MIDDLEWARE = [];
-//-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
+
 
 
 //===================Load All The Middleware Scripts===================//
@@ -115,7 +133,7 @@ app.use((err, req, res, next)=>
     if (err)
     {
         //Log the error.
-        logger.error(err);
+        logger.error(err, req.path);
 
         //If Dev Mode, send the stack trace as the response.
         if (process.env.NODE_ENV !== "production")
@@ -134,7 +152,7 @@ app.use((err, req, res, next)=>
         const fake_error = new Error("Express Default Error Handler: This error should not be triggered!!!");
 
         //Log the fake error.
-        logger.error(fake_error);
+        logger.error(fake_error, req.path);
 
         //If Dev Mode, send the stack trace as the response.
         if (process.env.NODE_ENV !== "production")

@@ -40,9 +40,10 @@ class Logger
      * @description Logs an Error object to the logger.log file and to the t_skyend_logger table.
      * 
      * @param {Error} err The error object.
+     * @param {string} path The request path if the error comes from a request.
      * @returns {void}
      */
-    error = (err)=>
+    error = (err, path="")=>
     {
         //If err has stack and message properties.
         if (err.stack && err.message);
@@ -58,7 +59,7 @@ class Logger
         }
 
         //Log the error.
-        this.logger.error({message: err.message, stack: err.stack});
+        this.logger.error({message: err.message, stack: err.stack, path: path});
 
         //If we are in Dev Mode.
         if (process.env.NODE_ENV !== "production")
@@ -73,6 +74,7 @@ class Logger
             m_level     : "error",
             m_message   : err.message,
             m_stack     : err.stack,
+            m_path      : path,
             m_timestamp : dayjs(Date.now()).format("YYYY-MM-DD hh:mm:ss")
         };
 
@@ -82,7 +84,7 @@ class Logger
         }).catch((err)=>
         {
             //Log the error.
-            this.logger.error({message: err.message, stack: err.stack});
+            this.logger.error({message: err.message, stack: err.stack, path: path});
 
             //If we are in Dev Mode.
             if (process.env.NODE_ENV !== "production")
