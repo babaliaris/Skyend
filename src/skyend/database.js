@@ -38,8 +38,6 @@ class Database
      */
     connect = ()=>
     {
-
-        //NEVER reject this promise, INSTEAD handle the error here!!!
         return new Promise((resolve)=>
         {
             //Create the connection object.
@@ -65,10 +63,16 @@ class Database
 
                     //Set the conn member to null.
                     this.conn = null;
+
+                    //Reject this promise.
+                    reject(err);
                 }
 
                 //Resolve this promise.
-                resolve();
+                else
+                {
+                    resolve();
+                }
             });
         });
     }
@@ -154,6 +158,9 @@ class Database
                     //Disconnect.
                     this.disconnect();
                 });
+            }).catch((err)=>
+            {
+                //Do nothing. this.connect() already logs this err.
             });
 
         });
@@ -228,6 +235,9 @@ class Database
                     //Disconnect.
                     this.disconnect();
                 });
+            }).catch((err)=>
+            {
+                //Do nothing. this.connect() already logs this err.
             });
             
         });
@@ -290,6 +300,9 @@ class Database
                     //Disconnect.
                     this.disconnect();
                 });
+            }).catch((err)=>
+            {
+                //Do nothing. this.connect() already logs this err.
             });
             
         });
@@ -352,6 +365,9 @@ class Database
                     //Disconnect.
                     this.disconnect();
                 });
+            }).catch((err)=>
+            {
+                //Do nothing. this.connect() already logs this err.
             });
             
         });
@@ -404,6 +420,9 @@ class Database
                     //Disconnect.
                     this.disconnect();
                 });
+            }).catch((err)=>
+            {
+                //Do nothing. this.connect() already logs this err.
             });
             
         });
