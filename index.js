@@ -96,6 +96,52 @@ walkdir.sync("./src/routers", (path, stat)=>
 
 
 
+
+//===================Express Default Error Handler====================//
+app.use((err, req, res, next)=>
+{
+    //Set the status code to INTERNAL ERROR.
+    res.statusCode = 500;
+
+
+    //If there was ineed an error that wansn't handled.
+    if (err)
+    {
+        //Log the error.
+        logger.error(err);
+
+        //If Dev Mode, send the stack trace as the response.
+        if (process.env.NODE_ENV !== "production")
+            res.send(err.stack);
+
+        //if production mode, just send a simple message.
+        else
+            res.send("Internal Error!");
+    }
+
+
+    //This code SHOULD NEVER BE REACHED.
+    else
+    {
+        //Create a fake error.
+        const fake_error = new Error("Express Default Error Handler: This error should not be triggered!!!");
+
+        //Log the fake error.
+        logger.error(fake_error);
+
+        //If Dev Mode, send the stack trace as the response.
+        if (process.env.NODE_ENV !== "production")
+            res.send(fake_error.stack);
+
+        //if production mode, just send a simple message.
+        else
+            res.send("Internal Error!");
+    }
+
+});
+//===================Express Default Error Handler====================//
+
+
 //Start the APP.
 app.listen(process.env.PORT, ()=>
 {
