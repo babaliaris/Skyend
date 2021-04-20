@@ -2,7 +2,15 @@
 const express   = require("express");
 const walkdir   = require("walkdir");
 const dotenv    = require("dotenv");
+const logger    = require("./src/skyend/logger");
 //################### Require ###################//
+
+
+//Uncaught Errors Handler.
+process.on("uncaughtException", (err)=>
+{
+    logger.error(err);
+});
 
 
 //Create the Express App.
@@ -83,14 +91,6 @@ walkdir.sync("./src/routers", (path, stat)=>
     }
 });
 //=====================Load All The Route Scripts=====================//
-
-
-
-//Uncaught Errors Handler.
-process.on("uncaughtException", (err)=>
-{
-    console.log(err.stack);
-});
 
 
 
