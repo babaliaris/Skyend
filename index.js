@@ -39,6 +39,7 @@ dotenv.config();
 //Set the LAST_REQUEST_PATH.
 app.use((req, res, next)=>
 {
+    //Set the LAST_REQUEST_PATH.
     LAST_REQUEST_PATH = req.path;
     next();
 });

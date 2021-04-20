@@ -59,23 +59,29 @@ class Logger
         }
 
         //Log the error.
-        this.logger.error({message: err.message, stack: err.stack, path: path});
+        this.logger.error({message: err.message, stack: err.stack, latest_request: path});
 
         //If we are in Dev Mode.
         if (process.env.NODE_ENV !== "production")
-            console.log(err.stack);
+        {
+            console.log("\n\n");
+            console.log(`Message        : ${err.message}`);
+            console.log(`Stack          : ${err.stack}`);
+            console.log(`Latest Request : ${path}`);
+            console.log("\n\n");
+        }
         
         //Create the database object.
         const db = new Database();
 
         //Create the log data.
         const log_data = {
-            m_source    : "Skyend",
-            m_level     : "error",
-            m_message   : err.message,
-            m_stack     : err.stack,
-            m_path      : path,
-            m_timestamp : dayjs(Date.now()).format("YYYY-MM-DD hh:mm:ss")
+            m_source            : "Skyend",
+            m_level             : "error",
+            m_message           : err.message,
+            m_stack             : err.stack,
+            m_latest_request    : path,
+            m_timestamp         : dayjs(Date.now()).format("YYYY-MM-DD hh:mm:ss")
         };
 
         //Insert the log into the t_skyend_logger table.
@@ -84,11 +90,17 @@ class Logger
         }).catch((err)=>
         {
             //Log the error.
-            this.logger.error({message: err.message, stack: err.stack, path: path});
+            this.logger.error({message: err.message, stack: err.stack, latest_request: path});
 
             //If we are in Dev Mode.
             if (process.env.NODE_ENV !== "production")
-                console.log(err.stack);
+            {
+                console.log("\n\n");
+                console.log(`Message        : ${err.message}`);
+                console.log(`Stack          : ${err.stack}`);
+                console.log(`Latest Request : ${path}`);
+                console.log("\n\n");
+            }
         });
     }
 };
