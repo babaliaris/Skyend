@@ -19,8 +19,10 @@ const app = express();
 //Load the environment variables.
 dotenv.config();
 
-//Public Folder Configuration.
-app.use(express.static("./public"));
+//----------------Basic MUST HAVE middlewares----------------//
+app.use(express.static("./public")); //Public Folder Configuration.
+app.use(express.json()); //JSON converter middleware.
+//----------------Basic MUST HAVE middlewares----------------//
 
 //-_-_-_-_-_-_-_-_-_-Global Variables-_-_-_-_-_-_-_-_-_-//
 let MIDDLEWARE = [];
