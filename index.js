@@ -163,5 +163,5 @@ app.use((err, req, res, next)=>
 //Start the APP.
 app.listen(process.env.PORT, ()=>
 {
-    console.log("Skyend is now Listening in port: "+process.env.PORT);
+    console.log("Skyend is now Listening. Port: "+process.env.PORT);
 });
