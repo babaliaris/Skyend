@@ -7,11 +7,12 @@ const bcrypt        = require("bcrypt");
  * @description This class contains methods to deal with authentication mechanisms.
  * THIS CLASS SHOULD NOT CONTAIN ANY MEMBERS OTHER THAN METHODS!!! ONLY ONE INSTANCE
  * OF THIS CLASS IS GENERATED.
+ * @class
  */
 class Authenticate
 {
     /**
-     * 
+     * @description Validate a JWT Token.
      * @param {string} token The token to be verified.
      * @return {Promise} The promise resolves(payload).
      */
@@ -41,7 +42,7 @@ class Authenticate
 
 
     /**
-     * 
+     * @description Create a JWT Token.
      * @param {object} payload The payload.
      * @param {string} expiration Expiration time. Examples: 60m, 60s, 1d, 1h
      * @return {Promise} The promise resolves(token).
@@ -70,7 +71,7 @@ class Authenticate
 
 
     /**
-     * 
+     * @description Create a bcrypt hash.
      * @param {string} password The password to be hashed.
      * @returns {Promise}
      */
@@ -114,6 +115,7 @@ class Authenticate
 
 
     /**
+     * @description Validate a bcrypt hash.
      * @param {string} password The password to be verified.
      * @param {string} hash The hash to be compared with the password.
      * @returns {Promise}

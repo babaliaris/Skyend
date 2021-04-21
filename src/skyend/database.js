@@ -24,9 +24,14 @@ const logger = winston.createLogger(
 
 
 
+/**
+ * @description A mysql Wrapper for easier usage.
+ * @class
+ */
 class Database
 {
     /**
+     * @description Use this propertie to have access to the mysql.Connection.
      * @type mysql.Connection
      */
     conn = null;
