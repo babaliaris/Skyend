@@ -146,16 +146,27 @@ app.use((err, req, res, next)=>
     //If there was ineed an error that wansn't handled.
     if (err)
     {
-        //Log the error.
-        logger.error(err, req.path);
 
-        //If Dev Mode, send the stack trace as the response.
-        if (process.env.NODE_ENV !== "production")
-            res.send(err.stack);
+        //Open api Validator Error Detected! Sent it to the client!!!
+        if (err.errors && err.errors.length > 0 && err.errors[0].path && err.errors[0].message && err.errors[0].errorCode)
+        {
+            res.status(err.status || 500).json(err.errors);
+        }
 
-        //if production mode, just send a simple message.
+        //Else, send information only if DEVELOPMENT mode is enabled!!!
         else
-            res.send("Internal Error!");
+        {
+            //Log the error.
+            logger.error(err, req.path);
+
+            //If Dev Mode, send the stack trace as the response.
+            if (process.env.NODE_ENV !== "production")
+                res.send(err.stack);
+
+            //if production mode, just send a simple message.
+            else
+                res.send("Internal Error!");
+        }
     }
 
 

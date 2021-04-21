@@ -5,16 +5,16 @@ clear_cmd = None
 #-_-_-_-_-_-Global Variables-_-_-_-_-_-#
 
 
-middleware_template = '''const express = require("express");
+middleware_template = '''const __express__ = require("express");
 
 //------------------------DO NOT MESH WITH THIS CODE------------------------//
 /**
  * 
  * @param {number} level 
  * @param {string} name 
- * @returns { {level: number, name: string, func: *, app: express.Application} }
+ * @returns { {level: number, name: string, func: *, app: __express__.Application} }
  */
-function Middleware(level, name) 
+function __Middleware__(level, name) 
 {
     return {
         level   : level,
@@ -26,7 +26,7 @@ function Middleware(level, name)
 //------------------------DO NOT MESH WITH THIS CODE------------------------//
 
 //Create the middleware object.
-const middle = Middleware(%order%, "%name%");
+const __middle__ = __Middleware__(%order%, "%name%");
 
 
 
@@ -48,38 +48,38 @@ const %name% = (req, res, next)=>
 
 
 //DO NOT MESH WITH THIS CODE.
-middle.func     = %name%;
-module.exports  = middle;'''
+__middle__.func = %name%;
+module.exports  = __middle__;'''
 
 
 
 
-router_template = '''const express   = require("express");
+router_template = '''const __express__   = require("express");
 
 //------------------------DO NOT MESH WITH THIS CODE------------------------//
 /**
  * 
  * @param {string} name 
- * @returns { {name: string, router: express.Router, app: express.Application} }
+ * @returns { {name: string, router: __express__.Router, app: __express__.Application} }
  */
-function Router(name) 
+function __Router__(name) 
 {
     return {
         name  : name,
-        router: express.Router(),
+        router: __express__.Router(),
         app   : null
     };
 }
 
-//Use router.router to access the express router.
-const router = Router("%name%");
+//Use __router__.router to access the express router.
+const __router__ = __Router__("%name%");
 //------------------------DO NOT MESH WITH THIS CODE------------------------//
 
 
 
 //---------------------This is where your code goes---------------------//
 
-router.router.get("/%name%", (req, res)=>
+__router__.router.get("/%name%", (req, res)=>
 {
     res.send("GET /%name% is working!");
 });
@@ -89,16 +89,16 @@ router.router.get("/%name%", (req, res)=>
 
 
 //DO NOT MESH WITH THIS CODE.
-module.exports  = router;'''
+module.exports  = __router__;'''
 
 
 
 startup_template = '''//Import express.js
-const express = require("express");
+const __express__ = require("express");
 
 /**
  * 
- * @param {express.Application} app 
+ * @param {__express__.Application} app 
  * @return {void}
  */
 const %name% = (app)=>
@@ -109,6 +109,143 @@ const %name% = (app)=>
 
 //Export the function.
 module.exports = %name%;'''
+
+
+
+public_middleware_template = '''const __express__ = require("express");
+
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+/**
+ * 
+ * @param {number} level 
+ * @param {string} name 
+ * @returns { {level: number, name: string, func: *, app: __express__.Application} }
+ */
+function __Middleware__(level, name) 
+{
+    return {
+        level   : level,
+        name    : name,
+        func    : null,
+        app     : null
+    };
+}
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+
+//Create the middleware object.
+const __middle__ = __Middleware__(%order%, "%name%");
+
+
+
+
+/**
+ * 
+ * @param {__express__.Request} req 
+ * @param {__express__.Response} res 
+ * @param {__express__.NextFunction} next 
+ */
+const %name% = __express__.static("./public");
+
+
+
+
+//DO NOT MESH WITH THIS CODE.
+__middle__.func = %name%;
+module.exports  = __middle__;'''
+
+
+
+
+json_middleware_template = '''const __express__ = require("express");
+
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+/**
+ * 
+ * @param {number} level 
+ * @param {string} name 
+ * @returns { {level: number, name: string, func: *, app: __express__.Application} }
+ */
+function __Middleware__(level, name) 
+{
+    return {
+        level   : level,
+        name    : name,
+        func    : null,
+        app     : null
+    };
+}
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+
+//Create the middleware object.
+const __middle__ = __Middleware__(%order%, "%name%");
+
+
+
+
+/**
+ * 
+ * @param {__express__.Request} req 
+ * @param {__express__.Response} res 
+ * @param {__express__.NextFunction} next 
+ */
+const %name% = __express__.json();
+
+
+
+
+//DO NOT MESH WITH THIS CODE.
+__middle__.func = %name%;
+module.exports  = __middle__;'''
+
+
+
+
+openapi_validator_middleware_template = '''const __express__   = require("express");
+const __validator__ = require("express-openapi-validator");
+
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+/**
+ * 
+ * @param {number} level 
+ * @param {string} name 
+ * @returns { {level: number, name: string, func: *, app: __express__.Application} }
+ */
+function __Middleware__(level, name) 
+{
+    return {
+        level   : level,
+        name    : name,
+        func    : null,
+        app     : null
+    };
+}
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+
+//Create the middleware object.
+const __middle__ = __Middleware__(%order%, "%name%");
+
+
+
+
+/**
+ * 
+ * @param {__express__.Request} req 
+ * @param {__express__.Response} res 
+ * @param {__express__.NextFunction} next 
+ */
+const %name% = __validator__.middleware({
+    apiSpec: './api.yaml',
+    validateRequests: true,
+    validateResponses: true
+});
+
+
+
+//DO NOT MESH WITH THIS CODE.
+__middle__.func = %name%;
+module.exports  = __middle__;'''
+
+
 
 
 
@@ -158,12 +295,62 @@ def main():
 #========================Create Middleware========================#
 def createMiddleware():
 
-    #Clear the screen.
-    os.system(clear_cmd)
+    #Some Variables.
+    template     = ""
+    choosen_info = "\nMiddleware name"
+
+    while True:
+
+        #Clear the screen.
+        os.system(clear_cmd)
+
+        #Print the menu.
+        print("=======Skyend (Middleware Menu)=======")
+        print("1)  New Middleware")
+        print("2) (Template) Express.public()")
+        print("3) (Template) Express.json()")
+        print("4) (Template) Open API Validator")
+        print("5)  Back to main menu")
+        print("=======Skyend (Middleware Menu)=======")
+
+        #Get user input.
+        choice = input(">>> ")
+
+        #Create new Middleware.
+        if choice == "1":
+            template = middleware_template
+            break
+        
+        #Create new express.public() middleware.
+        elif choice == "2":
+            template = public_middleware_template
+            choosen_info = choosen_info + " ( Template Express.public() )"
+            break
+
+        #Create new express.json() middleware.
+        elif choice == "3":
+            template = json_middleware_template
+            choosen_info = choosen_info + " ( Template Express.json() )"
+            break
+
+        #Create new open api validator middleware.
+        elif choice == "4":
+            template = openapi_validator_middleware_template
+            choosen_info = choosen_info + " ( Template Open API Validator )"
+            break
+        
+        #Return to the main menu..
+        elif choice == "5" or choice == "back" or choice == "return":
+            return
+        
+        #Uknown input, continue.
+        else:
+            continue
 
     #Get the name/path relative to the src/middleware directory.
-    path  = input("Middleware name: ")
-    order = input("Load Order     : ")
+    choosen_info    = choosen_info + ": "
+    path            = input(choosen_info)
+    order           = input("Load Order: ")
 
     #Split the filename and the extension.
     filename, file_extension = os.path.splitext(path)
@@ -182,6 +369,9 @@ def createMiddleware():
 
     #Create the script file.
     try:
+
+        #Check if order is a number.
+        int(order)
 
         #Create the directories first.
         os.makedirs(os.path.dirname(actual_path), exist_ok=True)
@@ -202,30 +392,40 @@ def createMiddleware():
 
         #Create and write the file.
         with open(actual_path, "w") as file:
-            file.write(middleware_template.replace("%name%", basename).replace("%order%", order))
+            file.write(template.replace("%name%", basename).replace("%order%", order))
+            
         
+
         #Print a success message.
         print("\nMiddleware:", actual_path, ", was created!!!")
         input("Press ENTER to continue...")
+        return
 
 
     #Permission Error.
     except PermissionError:
-        print("Middleware:'", actual_path, "' creation failed.")
+        print("\n\nMiddleware:'", actual_path, "' creation failed.")
         print("Reason    : Permission Denied.")
         print("Tip       : Make sure Skyend project has the appropriate file permissions.\n")
         input("Press ENTER to continue...")
 
     #File Not Found Error.
     except FileNotFoundError:
-        print("Middleware:'", actual_path, "' creation failed.")
+        print("\n\nMiddleware:'", actual_path, "' creation failed.")
         print("Reason    : Invalid name.")
         print("Tip       : Make sure the name is an appropriate file path.\n")
         input("Press ENTER to continue...")
 
+    #File Not Found Error.
+    except ValueError:
+        print("\n\nMiddleware:'", actual_path, "' creation failed.")
+        print("Reason    : Invalid order.")
+        print("Tip       : Make sure the order is an integer number.\n")
+        input("Press ENTER to continue...")
+
     #Uknown Error.
     except Exception:
-        print("Middleware:'", actual_path, "' creation failed.")
+        print("\n\nMiddleware:'", actual_path, "' creation failed.")
         print("Reason    : Uknown.")
         print("Tip       : Report this as a bug.\n")
         print("Stack     :", traceback.format_exc())
@@ -291,21 +491,21 @@ def createRouter():
 
     #Permission Error.
     except PermissionError:
-        print("Router:'", actual_path, "' creation failed.")
+        print("\n\nRouter:'", actual_path, "' creation failed.")
         print("Reason    : Permission Denied.")
         print("Tip       : Make sure Skyend project has the appropriate file permissions.\n")
         input("Press ENTER to continue...")
 
     #File Not Found Error.
     except FileNotFoundError:
-        print("Router:'", actual_path, "' creation failed.")
+        print("\n\nRouter:'", actual_path, "' creation failed.")
         print("Reason    : Invalid name.")
         print("Tip       : Make sure the name is an appropriate file path.\n")
         input("Press ENTER to continue...")
 
     #Uknown Error.
     except Exception:
-        print("Router:'", actual_path, "' creation failed.")
+        print("\n\nRouter:'", actual_path, "' creation failed.")
         print("Reason    : Uknown.")
         print("Tip       : Report this as a bug.\n")
         print("Stack     :", traceback.format_exc())
@@ -370,21 +570,21 @@ def createStartup():
 
     #Permission Error.
     except PermissionError:
-        print("StartUp:'", actual_path, "' creation failed.")
+        print("\n\nStartUp:'", actual_path, "' creation failed.")
         print("Reason    : Permission Denied.")
         print("Tip       : Make sure Skyend project has the appropriate file permissions.\n")
         input("Press ENTER to continue...")
 
     #File Not Found Error.
     except FileNotFoundError:
-        print("StartUp:'", actual_path, "' creation failed.")
+        print("\n\nStartUp:'", actual_path, "' creation failed.")
         print("Reason    : Invalid name.")
         print("Tip       : Make sure the name is an appropriate file path.\n")
         input("Press ENTER to continue...")
 
     #Uknown Error.
     except Exception:
-        print("StartUp:'", actual_path, "' creation failed.")
+        print("\n\nStartUp:'", actual_path, "' creation failed.")
         print("Reason    : Uknown.")
         print("Tip       : Report this as a bug.\n")
         print("Stack     :", traceback.format_exc())
