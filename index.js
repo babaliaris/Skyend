@@ -148,7 +148,7 @@ app.use((err, req, res, next)=>
     {
 
         //Open api Validator Error Detected! Sent it to the client!!!
-        if (err.errors && err.errors.length > 0 && err.errors[0].path && err.errors[0].message && err.errors[0].errorCode)
+        if (err.errors && err.errors.length > 0 && err.errors[0].path)
         {
             res.status(err.status || 500).json(err.errors);
         }
