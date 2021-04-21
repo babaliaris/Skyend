@@ -83,4 +83,63 @@ describe("Authenticate", ()=>
         });
     });
 
+
+
+
+    //Create Hash Test.
+    it("Create Hash", (done)=>
+    {
+        auth.createHash("password123").then((hash)=>
+        {
+            done();
+
+        }).catch((err)=>
+        {
+            done(err);
+        });
+    });
+
+
+
+
+    //Validate Hash Test.
+    it("Validate Hash", (done)=>
+    {
+        auth.createHash("password123").then((hash)=>
+        {
+            auth.validateHash("password123", hash).then((result)=>
+            {   
+                //Check if the result = TRUE (Meaning the validation succeedeed).
+                assert.strictEqual(result, true);
+
+                done();
+            });
+            
+        }).catch((err)=>
+        {
+            done(err);
+        });
+    });
+
+
+
+    //Faile To Validate Hash Test.
+    it("Fail To Validate Hash", (done)=>
+    {
+        auth.createHash("password123").then((hash)=>
+        {
+            auth.validateHash("password", hash).then((result)=>
+            {   
+                //Check if the result = FALSE (Meaning the validation failed).
+                assert.strictEqual(result, false);
+
+                done();
+            });
+            
+        }).catch((err)=>
+        {
+            done(err);
+        });
+    });
+
 });

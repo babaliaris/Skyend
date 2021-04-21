@@ -1,4 +1,5 @@
-const jsonWebToken = require("jsonwebtoken");
+const jsonWebToken  = require("jsonwebtoken");
+const bcrypt        = require("bcrypt");
 
 
 
@@ -61,6 +62,72 @@ class Authenticate
                 //Resolve the token.
                 else
                     resolve(token);
+            });
+
+        });
+    };
+
+
+
+    /**
+     * 
+     * @param {string} password The password to be hashed.
+     * @returns {Promise}
+     */
+    createHash = (password)=>
+    {
+        //Create the Promise.
+        return new Promise((resolve, reject)=>
+        {
+            //Create the salt.
+            bcrypt.genSalt(10, (err, salt)=>
+            {
+
+                //Failed to generate the salt.
+                if (err)
+                    reject(err);
+
+                //Salt generated Successfully!!!
+                else
+                {
+
+                    //Create the hash.
+                    bcrypt.hash(password, salt, (err, hash)=>
+                    {
+
+                        //Failed to generate the hash.
+                        if (err)
+                            reject(err);
+
+                        //Hash created successfully!!!
+                        else
+                            resolve(hash); 
+                    });
+
+                }
+            });
+
+        });
+    };
+
+
+
+
+    /**
+     * @param {string} password The password to be verified.
+     * @param {string} hash The hash to be compared with the password.
+     * @returns {Promise}
+     */
+    validateHash = (password, hash)=>
+    {
+        //Create the Promise.
+        return new Promise((resolve, reject)=>
+        {
+            //Compare the password and the hash.
+            bcrypt.compare(password, hash, (err, result)=>
+            {
+                if (err) reject(err);
+                else resolve(result);
             });
 
         });
