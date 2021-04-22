@@ -45,6 +45,10 @@ class Logger
      */
     error = (err, path)=>
     {
+        //Make sure path is defined.
+        if (path);
+        else path = "";
+
         //If err has stack and message properties.
         if (err.stack && err.message);
 
