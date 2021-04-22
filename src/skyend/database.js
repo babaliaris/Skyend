@@ -39,7 +39,7 @@ class Database
     
     /**
      * @description Connect to the database using the environment variables.
-     * @returns {Promise}
+     * @returns {Promise<mysql.Connection, mysql.MysqlError>}  Resolves the mysql.connection object.
      */
     connect = ()=>
     {
@@ -119,7 +119,7 @@ class Database
      * 
      * @param {string} table The name of the table.
      * @param {object} data  The data object. The properties of this obj must have THE SAME NAME as the columns in the table.
-     * @returns {Promise}
+     * @returns {Promise<Object, mysql.MysqlError>}
      */
     post = (table, data)=>
     {
@@ -165,7 +165,7 @@ class Database
                 });
             }).catch((err)=>
             {
-                //Do nothing. this.connect() already logs this err.
+                reject(err);
             });
 
         });
@@ -181,7 +181,7 @@ class Database
      * @param {string} table The name of the table.
      * @param {object} data  The data object. The properties of this obj must have THE SAME NAME as the columns in the table.
      * @param {object} where The where clause condition in key:value pair.
-     * @returns {Promise}
+     * @returns {Promise<Object, mysql.MysqlError>}  Resolves the results object.
      */
     put = (table, data, where)=>
     {
@@ -242,7 +242,7 @@ class Database
                 });
             }).catch((err)=>
             {
-                //Do nothing. this.connect() already logs this err.
+                reject(err);
             });
             
         });
@@ -257,7 +257,7 @@ class Database
      * 
      * @param {string} table The name of the table.
      * @param {object} where The where clause condition in key:value pair.
-     * @returns {Promise}
+     * @returns {Promise<Object, mysql.MysqlError>}  Resolves the results object.
      */
     delete = (table, where)=>
     {
@@ -307,7 +307,7 @@ class Database
                 });
             }).catch((err)=>
             {
-                //Do nothing. this.connect() already logs this err.
+                reject(err);
             });
             
         });
@@ -322,7 +322,7 @@ class Database
      * 
      * @param {string} table The name of the table.
      * @param {object} where The where clause condition in key:value pair.
-     * @returns {Promise}
+     * @returns {Promise<Array, mysql.MysqlError>} Resolves the results object.
      */
     get = (table, where)=>
     {
@@ -372,7 +372,7 @@ class Database
                 });
             }).catch((err)=>
             {
-                //Do nothing. this.connect() already logs this err.
+                reject(err);
             });
             
         });
@@ -387,7 +387,7 @@ class Database
      * 
      * @param {string} procedure The name of the procedure.
      * @param {Array}  args The procedure call arguments.
-     * @returns {Promise}
+     * @returns {Promise<Array | Object, mysql.MysqlError>} Resolves the results object.
      */
     call = (procedure, args)=>
     {
@@ -427,11 +427,56 @@ class Database
                 });
             }).catch((err)=>
             {
-                //Do nothing. this.connect() already logs this err.
+                reject(err);
             });
             
         });
 
+    };
+
+
+
+    
+
+    /**
+     * @description Execute a query. This method connects and disconnects automatically.
+     * 
+     * @param {string} query_string The query string. Example: SELECT * FROM users WHERE m_name = ?;
+     * @param {Array}  values An array with all the values that will map to ? marks.
+     * @returns {Promise<{results: Array | Object, fields: mysql.FieldInfo}, mysql.MysqlError>} Resolves the object {results: , fields: }
+     */
+    query = (query_string, values) =>
+    {   
+        //Create the Promise.
+        return new Promise((resolve, reject)=>
+        {
+            //Connect to the database.
+            this.connect().then(()=>
+            {   
+                //Execute the query.
+                this.conn.query(query_string, values, (err, results, fields)=>
+                {
+                    //Query Error.
+                    if (err)
+                    {
+                        reject(err);
+                    }
+
+                    //Resolve the Promise.
+                    else
+                    {
+                        resolve({results: results, fields: fields});
+                    }
+
+                    //Disconnect from the database.
+                    this.disconnect();
+                });
+
+            }).catch((err)=>
+            {
+                reject(err);
+            })
+        });
     };
      
 }
