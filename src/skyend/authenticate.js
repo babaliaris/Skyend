@@ -16,15 +16,17 @@ class Authenticate
      * @param {string} token The token to be verified.
      * @return {Promise} The promise resolves(payload).
      */
-    validateToken = (token)=>
+    validateToken = (token, isRefresh)=>
     {
 
         //Create the Promise.
         return new Promise((resolve, reject)=>
         {
+            //Choose the secret key.
+            const secret = isRefresh ? process.env.JSON_REFRESH_SECRET : process.env.JSON_TOKEN_SECRET;
 
             //Verify the token.
-            jsonWebToken.verify(token, process.env.JSON_TOKEN_SECRET, (err, payload)=>
+            jsonWebToken.verify(token, secret, (err, payload)=>
             {
                 
                 //Verification Failed.
@@ -47,13 +49,16 @@ class Authenticate
      * @param {string} expiration Expiration time. Examples: 60m, 60s, 1d, 1h
      * @return {Promise} The promise resolves(token).
      */
-    createToken = (payload, expiration)=>
+    createToken = (payload, expiration, isRefresh)=>
     {
         //Create the Promise.
         return new Promise((resolve, reject)=>
         {
+            //Choose the secret key.
+            const secret = isRefresh ? process.env.JSON_REFRESH_SECRET : process.env.JSON_TOKEN_SECRET;
+
             //Sign and Create the token.
-            jsonWebToken.sign(payload, process.env.JSON_TOKEN_SECRET, {"expiresIn": expiration}, (err, token)=>
+            jsonWebToken.sign(payload, secret, {"expiresIn": expiration}, (err, token)=>
             {
 
                 //Reject the error.

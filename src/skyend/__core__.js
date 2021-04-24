@@ -161,7 +161,26 @@ const skyend = (done)=>
             //Open api Validator Error Detected! Sent it to the client!!!
             if (err.errors && err.errors.length > 0 && err.errors[0].path)
             {
-                res.status(err.status || 500).json(err.errors);
+                //JUST A FLAG.
+                let is_respsonse_error = false;
+
+                //Check for response errors (RESPONSES ERRORS SHOULD ONLY BE LOGGED).
+                err.errors.forEach((val)=>
+                {
+                    //This is a response error.
+                    if ( val.path.includes(".response") )
+                    {
+                        logger.error(err, req.path);
+                        is_respsonse_error = true;
+                        res.status(500).json({m_message: "Internal Error"});
+                        return;
+                    }
+                    
+                });
+
+                //Send errors.
+                if (!is_respsonse_error)
+                    res.status(err.status || 500).json(err.errors);
             }
 
             //Else, send information only if DEVELOPMENT mode is enabled!!!

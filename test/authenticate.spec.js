@@ -16,7 +16,7 @@ describe("Authenticate", ()=>
     it("Create Token", (done)=>
     {
         //Create the token.
-        auth.createToken({m_username: "nikos"}, "1m").then((token)=>
+        auth.createToken({m_username: "nikos"}, "1m", false).then((token)=>
         {
             done();
 
@@ -31,10 +31,10 @@ describe("Authenticate", ()=>
     it("Validate Token", (done)=>
     {
         //Create the token.
-        auth.createToken({m_username: "nikos"}, "1m").then((token)=>
+        auth.createToken({m_username: "nikos"}, "1m", false).then((token)=>
         {
             //Validate the token.
-            auth.validateToken(token).then((payload)=>
+            auth.validateToken(token, false).then((payload)=>
             {
                 //Check the payload m_username.
                 assert.strictEqual(payload.m_username, "nikos");
@@ -61,7 +61,7 @@ describe("Authenticate", ()=>
         const timeoutCallback = (token)=>
         {
             //Validate the token.
-            auth.validateToken(token).then((payload)=>
+            auth.validateToken(token, false).then((payload)=>
             {
                 done(new Error("This should fail to validate!"));
                 
@@ -73,7 +73,7 @@ describe("Authenticate", ()=>
 
 
         //Create the token (EXPIRES IN: 1 SECOND).
-        auth.createToken({m_username: "nikos"}, "1ms").then((token)=>
+        auth.createToken({m_username: "nikos"}, "1ms", false).then((token)=>
         {
             setTimeout(timeoutCallback, 2, token);
 
