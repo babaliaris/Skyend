@@ -1,6 +1,7 @@
 const mysql                     = require("mysql");
 const { WinstonRotatingFile }   = require("winston-rotating-file");
 const winston                   = require('winston');
+const e = require("express");
 
 
 //Create the winston logger object.
@@ -45,13 +46,30 @@ class Database
     {
         return new Promise((resolve, reject)=>
         {
-            //Create the connection object.
-            this.conn = mysql.createConnection({
-                database: process.env.DB_NAME,
-                user    : process.env.DB_USER,
-                password: process.env.DB_PASS,
-                host    : process.env.DB_HOST
-            });
+
+            //Development Database.
+            if (process.env.NODE_ENV !== "production")
+            {
+                //Create the connection object.
+                this.conn = mysql.createConnection({
+                    database: process.env.TEST_DB_NAME,
+                    user    : process.env.TEST_DB_USER,
+                    password: process.env.TEST_DB_PASS,
+                    host    : process.env.TEST_DB_HOST
+                });
+            }
+
+            //Production Database.
+            else
+            {
+                //Create the connection object.
+                this.conn = mysql.createConnection({
+                    database: process.env.DB_NAME,
+                    user    : process.env.DB_USER,
+                    password: process.env.DB_PASS,
+                    host    : process.env.DB_HOST
+                });
+            }
 
             //Try to connect to the database.
             this.conn.connect((err)=>
