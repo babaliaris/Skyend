@@ -44,7 +44,7 @@ class Logger
      * @returns {void}
      */
     error = (err, path)=>
-    {
+    {	
         //If err has stack and message properties.
         if (err.stack && err.message);
 
@@ -66,9 +66,9 @@ class Logger
         if (process.env.NODE_ENV !== "production")
         {
             console.log("\n\n");
-            console.log(`Message        : ${err.message}`);
-            console.log(`Stack          : ${err.stack}`);
-            console.log(`Latest Request : ${path}`);
+            console.log(`Message (Error) : ${err.message}`);
+            console.log(`Stack           : ${err.stack}`);
+            console.log(`Latest Request  : ${path}`);
             console.log("\n\n");
         }
         
@@ -97,9 +97,155 @@ class Logger
             if (process.env.NODE_ENV !== "production")
             {
                 console.log("\n\n");
-                console.log(`Message        : ${err.message}`);
-                console.log(`Stack          : ${err.stack}`);
-                console.log(`Latest Request : ${path}`);
+                console.log(`Message (Error) : ${err.message}`);
+                console.log(`Stack           : ${err.stack}`);
+                console.log(`Latest Request  : ${path}`);
+                console.log("\n\n");
+            }
+        });
+    }
+
+
+
+
+
+
+    /**
+     * @description Logs an Error object to the logger.log file and to the t_skyend_logger table as a warning.
+     * 
+     * @param {Error} err The error object.
+     * @param {string} path The request path if the error comes from a request.
+     * @returns {void}
+     */
+    warn = (err, path)=>
+    {	
+        //If err has stack and message properties.
+        if (err.stack && err.message);
+
+        //Do not accept a non Error object.
+        else
+        {
+            //Represent the object structure as a string.
+            const err_string = util.inspect(err, false, null, true);
+
+            //Create a fake error.
+            err = new Error("Uknown Warning ===> "+err_string);
+            err.stack = ""; //Remove the stack.
+        }
+
+        //Log the error.
+        this.logger.warn({message: err.message, stack: err.stack, latest_request: path});
+
+        //If we are in Dev Mode.
+        if (process.env.NODE_ENV !== "production")
+        {
+            console.log("\n\n");
+            console.log(`Message (Warning) : ${err.message}`);
+            console.log(`Stack             : ${err.stack}`);
+            console.log(`Latest Request    : ${path}`);
+            console.log("\n\n");
+        }
+        
+        //Create the database object.
+        const db = new Database();
+
+        //Create the log data.
+        const log_data = {
+            m_source            : "Skyend",
+            m_level             : "warning",
+            m_message           : err.message,
+            m_stack             : err.stack,
+            m_latest_request    : path,
+            m_timestamp         : dayjs(Date.now()).format("YYYY-MM-DD hh:mm:ss")
+        };
+
+        //Insert the log into the t_skyend_logger table.
+        db.post("t_skyend_logger", log_data).then((results)=>
+        {
+        }).catch((err)=>
+        {
+            //Log the error.
+            this.logger.error({message: err.message, stack: err.stack, latest_request: path});
+
+            //If we are in Dev Mode.
+            if (process.env.NODE_ENV !== "production")
+            {
+                console.log("\n\n");
+                console.log(`Message (Error) : ${err.message}`);
+                console.log(`Stack           : ${err.stack}`);
+                console.log(`Latest Request  : ${path}`);
+                console.log("\n\n");
+            }
+        });
+    }
+
+
+
+
+    /**
+     * @description Logs an Error object to the logger.log file and to the t_skyend_logger table as a warning.
+     * 
+     * @param {Error} err The error object.
+     * @param {string} path The request path if the error comes from a request.
+     * @returns {void}
+     */
+    info = (err, path)=>
+    {	
+        //If err has stack and message properties.
+        if (err.stack && err.message);
+
+        //Do not accept a non Error object.
+        else
+        {
+            //Represent the object structure as a string.
+            const err_string = util.inspect(err, false, null, true);
+
+            //Create a fake error.
+            err = new Error("Uknown Info ===> "+err_string);
+            err.stack = ""; //Remove the stack.
+        }
+
+        //Log the error.
+        this.logger.info({message: err.message, stack: err.stack, latest_request: path});
+
+        //If we are in Dev Mode.
+        if (process.env.NODE_ENV !== "production")
+        {
+            console.log("\n\n");
+            console.log(`Message (Info) : ${err.message}`);
+            console.log(`Stack          : ${err.stack}`);
+            console.log(`Latest Request : ${path}`);
+            console.log("\n\n");
+        }
+        
+        //Create the database object.
+        const db = new Database();
+
+        //Create the log data.
+        const log_data = {
+            m_source            : "Skyend",
+            m_level             : "info",
+            m_message           : err.message,
+            m_stack             : err.stack,
+            m_latest_request    : path,
+            m_timestamp         : dayjs(Date.now()).format("YYYY-MM-DD hh:mm:ss")
+        };
+
+        //Insert the log into the t_skyend_logger table.
+        db.post("t_skyend_logger", log_data).then((results)=>
+        {
+        }).catch((err)=>
+        {
+            //Log the error.
+            this.logger.error({message: err.message, stack: err.stack, latest_request: path});
+
+            //If we are in Dev Mode.
+            if (process.env.NODE_ENV !== "production")
+            {
+                console.log("\n\n");
+                console.log(`Message (Error) : ${err.message}`);
+                console.log(`Stack           : ${err.stack}`);
+                console.log(`Latest Request  : ${path}`);
                 console.log("\n\n");
             }
         });

@@ -4,7 +4,7 @@
   "description": "An Express.js based Back-End framework",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 4000"
   },
   "repository": {
     "type": "git",
