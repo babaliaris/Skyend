@@ -33,9 +33,9 @@ const __middle__ = __Middleware__(%order%, "%name%");
 
 /**
  * 
- * @param {express.Request} req 
- * @param {express.Response} res 
- * @param {express.NextFunction} next 
+ * @param {__express__.Request} req 
+ * @param {__express__.Response} res 
+ * @param {__express__.NextFunction} next 
  */
 const %name% = (req, res, next)=>
 {
@@ -249,6 +249,67 @@ module.exports  = __middle__;'''
 
 
 
+xss_middleware_template = '''const __express__   = require("express");
+const __xss__           = require("xss");
+
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+/**
+ * 
+ * @param {number} level 
+ * @param {string} name 
+ * @returns { {level: number, name: string, func: *, app: __express__.Application} }
+ */
+function __Middleware__(level, name) 
+{
+    return {
+        level   : level,
+        name    : name,
+        func    : null,
+        app     : null
+    };
+}
+//------------------------DO NOT MESH WITH THIS CODE------------------------//
+
+//Create the middleware object.
+const __middle__ = __Middleware__(2, "%name%");
+
+
+
+
+/**
+ * 
+ * @param {__express__.Request} req 
+ * @param {__express__.Response} res 
+ * @param {__express__.NextFunction} next 
+ */
+const %name% = (req, res, next)=>
+{
+    //Filter body params.
+    for (key in req.body)
+    {
+        req.body[key] = __xss__(req.body[key]);
+    }
+
+    //Filter query params.
+    for (key in req.params)
+    {
+        req.params[key] = __xss__(req.params[key]);
+    }
+
+    //Next middleware.
+    next();
+};
+
+
+
+
+//DO NOT MESH WITH THIS CODE.
+__middle__.func = %name%;
+module.exports  = __middle__;'''
+
+
+
+
 #============================Main Menu============================#
 def main():
     
@@ -310,7 +371,8 @@ def createMiddleware():
         print("2) (Template) Express.public()")
         print("3) (Template) Express.json()")
         print("4) (Template) Open API Validator")
-        print("5)  Back to main menu")
+        print("5) (Template) XSS Middleware")
+        print("6)  Back to main menu")
         print("=======Skyend (Middleware Menu)=======")
 
         #Get user input.
@@ -338,9 +400,16 @@ def createMiddleware():
             template = openapi_validator_middleware_template
             choosen_info = choosen_info + " ( Template Open API Validator )"
             break
+
+
+        #Create XSS Middleware.
+        elif choice == "5":
+            template = xss_middleware_template
+            choosen_info = choosen_info + " ( Template XSS Middleware )"
+            break
         
         #Return to the main menu..
-        elif choice == "5" or choice == "back" or choice == "return":
+        elif choice == "6" or choice == "back" or choice == "return":
             return
         
         #Uknown input, continue.
