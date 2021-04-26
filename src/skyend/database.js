@@ -1,7 +1,6 @@
 const mysql                     = require("mysql");
 const { WinstonRotatingFile }   = require("winston-rotating-file");
 const winston                   = require('winston');
-const e = require("express");
 
 
 //Create the winston logger object.
@@ -30,14 +29,7 @@ const logger = winston.createLogger(
  * @class
  */
 class Database
-{
-    /**
-     * @description Use this propertie to have access to the mysql.Connection.
-     * @type mysql.Connection
-     */
-    conn = null;
-
-    
+{    
     /**
      * @description Connect to the database using the environment variables.
      * @returns {Promise<mysql.Connection, mysql.MysqlError>}  Resolves the mysql.connection object.
@@ -46,12 +38,14 @@ class Database
     {
         return new Promise((resolve, reject)=>
         {
+            //Connection object.
+            let conn = null;
 
             //Development Database.
             if (process.env.NODE_ENV !== "production")
             {
                 //Create the connection object.
-                this.conn = mysql.createConnection({
+                conn = mysql.createConnection({
                     database: process.env.TEST_DB_NAME,
                     user    : process.env.TEST_DB_USER,
                     password: process.env.TEST_DB_PASS,
@@ -63,7 +57,7 @@ class Database
             else
             {
                 //Create the connection object.
-                this.conn = mysql.createConnection({
+                conn = mysql.createConnection({
                     database: process.env.DB_NAME,
                     user    : process.env.DB_USER,
                     password: process.env.DB_PASS,
@@ -72,7 +66,7 @@ class Database
             }
 
             //Try to connect to the database.
-            this.conn.connect((err)=>
+            conn.connect((err)=>
             {   
                 //Log the error.
                 if (err)
@@ -84,9 +78,6 @@ class Database
                     if (process.env.NODE_ENV !== "production")
                         console.log(err.stack);
 
-                    //Set the conn member to null.
-                    this.conn = null;
-
                     //Reject this promise.
                     reject(err);
                 }
@@ -94,7 +85,7 @@ class Database
                 //Resolve this promise.
                 else
                 {
-                    resolve(this.conn);
+                    resolve(conn);
                 }
             });
         });
@@ -104,14 +95,16 @@ class Database
 
     /**
      * @description Disconnect from the database (Close the connection).
+     * @param {mysql.Connection} conn The myslq.Connection object.
      * @returns {void}
      */
-    disconnect = ()=>
+    disconnect = (conn)=>
     {
         //if this.conn is defined and not null.
-        if (this.conn)
+        if (conn)
         {
-            this.conn.end((err)=>
+            //End the connection.
+            conn.end((err)=>
             {
                 //Log the error.
                 if (err)
@@ -123,9 +116,6 @@ class Database
                     if (process.env.NODE_ENV !== "production")
                         console.log(err.stack);
                 }
-
-                //Set the conn member to null.
-                this.conn = null;
             });
         }
     }
@@ -165,10 +155,10 @@ class Database
             const query = `INSERT INTO ${table} (${columns}) VALUES (${markers});`;
             
             //Connect.
-            this.connect().then(()=>
+            this.connect().then((conn)=>
             {
                 //EXECUTE THE QUERY.
-                this.conn.query(query, values, (err, results)=>
+                conn.query(query, values, (err, results)=>
                 {   
                     //An error has occured.
                     if (err)
@@ -179,7 +169,7 @@ class Database
                         resolve(results);
                     
                     //Disconnect.
-                    this.disconnect();
+                    this.disconnect(conn);
                 });
             }).catch((err)=>
             {
@@ -242,10 +232,10 @@ class Database
             const query = `UPDATE ${table} SET ${columns} WHERE ${where_cond};`;
             
             //Connect.
-            this.connect().then(()=>
+            this.connect().then((conn)=>
             {
                 //EXECUTE THE QUERY.
-                this.conn.query(query, values, (err, results)=>
+                conn.query(query, values, (err, results)=>
                 {   
                     //An error has occured.
                     if (err)
@@ -256,7 +246,7 @@ class Database
                         resolve(results);
                     
                     //Disconnect.
-                    this.disconnect();
+                    this.disconnect(conn);
                 });
             }).catch((err)=>
             {
@@ -307,10 +297,10 @@ class Database
             const query = `DELETE FROM ${table} WHERE ${where_cond};`;
             
             //Connect.
-            this.connect().then(()=>
+            this.connect().then((conn)=>
             {
                 //EXECUTE THE QUERY.
-                this.conn.query(query, values, (err, results)=>
+                conn.query(query, values, (err, results)=>
                 {   
                     //An error has occured.
                     if (err)
@@ -321,7 +311,7 @@ class Database
                         resolve(results);
                     
                     //Disconnect.
-                    this.disconnect();
+                    this.disconnect(conn);
                 });
             }).catch((err)=>
             {
@@ -372,10 +362,10 @@ class Database
             const query = `SELECT * FROM ${table} WHERE ${where_cond};`;
             
             //Connect.
-            this.connect().then(()=>
+            this.connect().then((conn)=>
             {
                 //EXECUTE THE QUERY.
-                this.conn.query(query, values, (err, results)=>
+                conn.query(query, values, (err, results)=>
                 {   
                     //An error has occured.
                     if (err)
@@ -386,7 +376,7 @@ class Database
                         resolve(results);
                     
                     //Disconnect.
-                    this.disconnect();
+                    this.disconnect(conn);
                 });
             }).catch((err)=>
             {
@@ -427,10 +417,10 @@ class Database
             const query = `CALL ${procedure}(${markers});`;
             
             //Connect.
-            this.connect().then(()=>
+            this.connect().then((conn)=>
             {
                 //EXECUTE THE QUERY.
-                this.conn.query(query, values, (err, results)=>
+                conn.query(query, values, (err, results)=>
                 {   
                     //An error has occured.
                     if (err)
@@ -441,7 +431,7 @@ class Database
                         resolve(results);
                     
                     //Disconnect.
-                    this.disconnect();
+                    this.disconnect(conn);
                 });
             }).catch((err)=>
             {
@@ -469,10 +459,10 @@ class Database
         return new Promise((resolve, reject)=>
         {
             //Connect to the database.
-            this.connect().then(()=>
+            this.connect().then((conn)=>
             {   
                 //Execute the query.
-                this.conn.query(query_string, values, (err, results, fields)=>
+                conn.query(query_string, values, (err, results, fields)=>
                 {
                     //Query Error.
                     if (err)
@@ -487,7 +477,7 @@ class Database
                     }
 
                     //Disconnect from the database.
-                    this.disconnect();
+                    this.disconnect(conn);
                 });
 
             }).catch((err)=>
@@ -499,4 +489,4 @@ class Database
      
 }
 
-module.exports = Database;
+module.exports = new Database();

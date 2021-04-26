@@ -2,7 +2,7 @@ const { WinstonRotatingFile }   = require("winston-rotating-file");
 const winston                   = require('winston');
 const util                      = require("util");
 const dayjs                     = require("dayjs");
-const Database                  = require("./database");
+const db                        = require("./database");
 
 
 class Logger
@@ -71,9 +71,6 @@ class Logger
             console.log(`Latest Request  : ${path}`);
             console.log("\n\n");
         }
-        
-        //Create the database object.
-        const db = new Database();
 
         //Create the log data.
         const log_data = {
@@ -145,9 +142,6 @@ class Logger
             console.log(`Latest Request    : ${path}`);
             console.log("\n\n");
         }
-        
-        //Create the database object.
-        const db = new Database();
 
         //Create the log data.
         const log_data = {
@@ -217,9 +211,6 @@ class Logger
             console.log(`Latest Request : ${path}`);
             console.log("\n\n");
         }
-        
-        //Create the database object.
-        const db = new Database();
 
         //Create the log data.
         const log_data = {

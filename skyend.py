@@ -250,7 +250,7 @@ module.exports  = __middle__;'''
 
 
 xss_middleware_template = '''const __express__   = require("express");
-const __xss__           = require("xss");
+const __xss__       = require("xss");
 
 //------------------------DO NOT MESH WITH THIS CODE------------------------//
 /**
@@ -284,16 +284,24 @@ const __middle__ = __Middleware__(2, "%name%");
  */
 const %name% = (req, res, next)=>
 {
-    //Filter body params.
+    //Filter body properties.
     for (key in req.body)
     {
-        req.body[key] = __xss__(req.body[key]);
+        //If it is a string.
+        if (req.body[key] instanceof String || typeof req.body[key] === "string")
+        {
+            req.body[key] = __xss__(req.body[key]);
+        }
     }
 
     //Filter query params.
-    for (key in req.params)
+    for (key in req.query)
     {
-        req.params[key] = __xss__(req.params[key]);
+        //If it is a string.
+        if (req.query[key] instanceof String || typeof req.query[key] === "string")
+        {
+            req.query[key] = __xss__(req.query[key]);
+        }
     }
 
     //Next middleware.
